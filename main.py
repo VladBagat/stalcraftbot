@@ -1,8 +1,9 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from Stalcraft.api_key import discord_key
-from Stalcraft.main import retrieve_login
+from Methods.api_key import discord_key
+from Methods.API_requests import retrieve_login
+from Methods.functions import process_date
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -18,9 +19,11 @@ async def on_ready():
     except Exception as e:
         print(e)
 
-@bot.tree.command(name="online")
-async def fetch_online(interaction: discord.Interaction):
-    online = retrieve_login()
-    await interaction.response.send_message(online)
+@bot.tree.command(name="online", description="Узнать онлайн выбранного игрока")
+async def fetch_online(interaction: discord.Interaction, player: str):
+    online = retrieve_login(player)
 
+    message = process_date(online, player)
+
+    await interaction.response.send_message(message)
 bot.run(discord_key)
