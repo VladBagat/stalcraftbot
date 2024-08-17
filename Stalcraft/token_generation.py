@@ -1,5 +1,5 @@
 import requests
-from api_key import user_id, secret, client_token
+from Stalcraft.api_key import user_id, secret, client_token
 
 def get_token():
     url = "https://exbo.net/oauth/token"
