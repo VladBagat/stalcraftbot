@@ -18,3 +18,8 @@ env/
 
 # Rope project settings
 .ropeproject
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
