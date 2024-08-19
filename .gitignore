@@ -25,3 +25,7 @@ __pycache__/
 *$py.class
 
 dump.py
+
+api_key.py
+
+Methods\api_key.py
