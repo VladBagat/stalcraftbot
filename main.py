@@ -1,7 +1,7 @@
 import discord
 from discord import app_commands
 from discord.ext import commands
-from Methods.api_key import discord_key
+from api_key import discord_key
 from Methods.API_requests import retrieve_login
 from Methods.functions import process_date
 
@@ -26,4 +26,5 @@ async def fetch_online(interaction: discord.Interaction, player: str):
     message = process_date(online, player)
 
     await interaction.response.send_message(message)
+    
 bot.run(discord_key)
