@@ -2,3 +2,4 @@ Babel==2.16.0
 discord.py==2.4.0
 pytz==2024.1
 Requests==2.32.3
+psycopg2==2.9.9
