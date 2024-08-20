@@ -1,5 +1,6 @@
 import discord
-from discord import app_commands
+from discord import Interaction
+from discord.ui import View, Button, button
 from discord.ext import commands
 from api_key import discord_key
 from Methods.API_requests import retrieve_login
@@ -29,9 +30,50 @@ async def fetch_online(interaction: discord.Interaction, player: str):
 
     await interaction.response.send_message(message)
 
-#Update hiatus status
+#Create a questionary about hiatus 
+
+
+class HiatusView(View):
+
+    def __init__(self, user_id):
+        super().__init__()
+        self.hiatus_num = 2
+        self.user_id = user_id
+        self.msg = None 
+
+    @button(label='Пропускаю', emoji='💤', style=discord.ButtonStyle.danger)
+    async def hiatus_post(self, interaction: Interaction, button: Button):
+        is_hiatus = False
+
+        if button.style == discord.ButtonStyle.success:
+            button.style = discord.ButtonStyle.danger
+            self.hiatus_num += 1
+            is_hiatus = False
+            await interaction.response.edit_message(view=self)
+            
+        else:
+            button.style = discord.ButtonStyle.success
+            self.hiatus_num -= 1
+            is_hiatus = True
+            await interaction.response.edit_message(view=self)
+
+            if self.msg is None:
+                self.msg = await interaction.followup.send(content=f"Пропуск засчитан. Оставшееся количество пропусков: {self.hiatus_num}", ephemeral=True)
+            else:
+                await self.msg.edit(content=f"Пропуск засчитан. Оставшееся количество пропусков: {self.hiatus_num}")
+
+        if is_hiatus:    
+            await self.msg.edit(content=f"Пропуск засчитан. Оставшееся количество пропусков: {self.hiatus_num}")
+            
+        else:
+            await self.msg.edit(content=f"Пропуск отменён. Оставшееся количество пропусков: {self.hiatus_num}")
+            
+
 @bot.tree.command(name='hiatus', description='Опубликовать опрос о пропусках')
-async def hiatus_post(interaction: discord.Interaction):
-    await interaction.response.send_message('Sigma')
+async def hiatus_command(interaction: discord.Interaction):
+    view = HiatusView(user_id=interaction.user.id)
+    await interaction.response.send_message('Нажмите на кнопку, чтобы отметить пропуск.', view=view)
+
+
 
 bot.run(discord_key)
