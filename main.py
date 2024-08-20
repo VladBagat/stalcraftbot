@@ -31,7 +31,7 @@ async def fetch_online(interaction: discord.Interaction, player: str):
 
 #Update hiatus status
 @bot.tree.command(name='hiatus', description='Опубликовать опрос о пропусках')
-async def hiatus_post(ctx):
-    await ctx.send('Sigma')
+async def hiatus_post(interaction: discord.Interaction):
+    await interaction.response.send_message('Sigma')
 
 bot.run(discord_key)
