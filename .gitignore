@@ -26,7 +26,5 @@ __pycache__/
 
 dump.py
 
-api_key.py
-db_key.py
 __pycache__/api_key.cpython-312.pyc
 test.py
