@@ -5,6 +5,7 @@ from discord.ext import commands
 from api_key import discord_key
 from Methods.API_requests import retrieve_login
 from Methods.functions import process_date
+from asyncio import gather
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -31,49 +32,61 @@ async def fetch_online(interaction: discord.Interaction, player: str):
     await interaction.response.send_message(message)
 
 #Create a questionary about hiatus 
+class HiatusButton(View):
+    def __init__(self, *, timeout: int = 1800):
+        super().__init__(timeout=timeout)
+        self.user_list = {}
+        self.last_message = None
+        self.last_user = None
+    
+    def create_hiatus_response_message(self, user_id):
 
-
-class HiatusView(View):
-
-    def __init__(self, user_id):
-        super().__init__()
-        self.hiatus_num = 2
-        self.user_id = user_id
-        self.msg = None 
-
-    @button(label='Пропускаю', emoji='💤', style=discord.ButtonStyle.danger)
-    async def hiatus_post(self, interaction: Interaction, button: Button):
-        is_hiatus = False
-
-        if button.style == discord.ButtonStyle.success:
-            button.style = discord.ButtonStyle.danger
-            self.hiatus_num += 1
-            is_hiatus = False
-            await interaction.response.edit_message(view=self)
+        hiatus_num, on_hiatus = self.user_list.get(f'{user_id}')
+        
+        if not on_hiatus:
+            on_hiatus = True
+            hiatus_num -= 1
+            message = f'Пропускаю. Осталось пропусков: **{hiatus_num}**'
             
         else:
-            button.style = discord.ButtonStyle.success
-            self.hiatus_num -= 1
-            is_hiatus = True
-            await interaction.response.edit_message(view=self)
-
-            if self.msg is None:
-                self.msg = await interaction.followup.send(content=f"Пропуск засчитан. Оставшееся количество пропусков: {self.hiatus_num}", ephemeral=True)
-            else:
-                await self.msg.edit(content=f"Пропуск засчитан. Оставшееся количество пропусков: {self.hiatus_num}")
-
-        if is_hiatus:    
-            await self.msg.edit(content=f"Пропуск засчитан. Оставшееся количество пропусков: {self.hiatus_num}")
+            on_hiatus = False
+            hiatus_num += 1
+            message = f'Не пропускаю. Осталось пропусков: **{hiatus_num}**'
             
+        self.user_list[f'{user_id}'] = (hiatus_num, on_hiatus)
+        return message
+
+    @discord.ui.button(label='Отпуск', emoji='🙏', style=discord.ButtonStyle.blurple)
+    async def hiatus(self, interaction: discord.Interaction, button: discord.ui.Button):
+
+        user_id = interaction.user.id
+
+        try: 
+            temp = self.user_list[f'{user_id}']
+            
+            message = self.create_hiatus_response_message(user_id)
+
+        except KeyError:
+            self.user_list.update({f"{user_id}":(2, False)})
+
+            message = self.create_hiatus_response_message(user_id)
+
+        tasks = []
+
+        tasks.append(interaction.response.send_message(message, ephemeral=True, delete_after=30))
+    
+        if self.last_message and self.last_user == user_id:
+            tasks.append(self.last_message.delete())
         else:
-            await self.msg.edit(content=f"Пропуск отменён. Оставшееся количество пропусков: {self.hiatus_num}")
-            
+            pass
 
-@bot.tree.command(name='hiatus', description='Опубликовать опрос о пропусках')
-async def hiatus_command(interaction: discord.Interaction):
-    view = HiatusView(user_id=interaction.user.id)
-    await interaction.response.send_message('Нажмите на кнопку, чтобы отметить пропуск.', view=view)
+        await gather(*tasks)
 
-
+        self.last_message = await interaction.original_response()   
+        self.last_user = user_id  
+        
+@bot.tree.command(name='hiatus', description='Запустить опрос о пропусках')
+async def hiatus_message(interaction: discord.Interaction):
+    await interaction.response.send_message(view=HiatusButton())
 
 bot.run(discord_key)
