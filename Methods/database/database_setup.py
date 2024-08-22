@@ -48,5 +48,3 @@ def insert_players(conn, data):
     conn.commit()
     cur.close()
 
-initiate_database()
-
