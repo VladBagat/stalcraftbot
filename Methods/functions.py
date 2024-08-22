@@ -29,3 +29,21 @@ def process_date(user_datetime, player):
 
     # Creating a message to be sent by bot
     return f"Игрок {player} был в сети в {parsed_time}, {formatted_date}"
+
+def parse_nickname(user):
+    """
+    Parses the nickname from a given user string.
+    Expected format: "[X]Foo|Name"
+    """
+    
+    try:
+        nickname = user.split(']')[1].split('|')[0].replace(" ", "")
+    except (IndexError, AttributeError):
+        raise ValueError("Invalid nickname format.")
+    
+    if len(nickname) <= 4:
+        raise ValueError("Invalid input: string is too short or not a string.")
+
+    return nickname
+
+
