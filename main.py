@@ -4,8 +4,11 @@ from discord.ui import View, Button, button
 from discord.ext import commands
 from api_key import discord_key
 from Methods.API_requests import retrieve_login
-from Methods.functions import process_date
+from Methods.functions import process_date, parse_nickname
+from Methods.database.database_requests import fetch_hiatus, connect_to_database
 from asyncio import gather
+
+pool = None
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -56,6 +59,33 @@ class HiatusButton(View):
         self.user_list[f'{user_id}'] = (hiatus_num, on_hiatus)
         return message
 
+    async def initiate_user(self, interaction):
+        #Prepairing user data
+        
+        user_nick = interaction.user.nick
+
+        try:
+            user_nickname = parse_nickname(user_nick)
+        except ValueError as e:
+            await error_handler(e, interaction)
+
+        #Pool a DB connection
+
+        conn = pool.getconn()
+
+        #Fetch data from DB
+        try:
+            hiatus_num, on_hiatus = fetch_hiatus(conn, user_nickname)
+        except Exception as e:
+            await error_handler(e, interaction)
+        finally:
+            pool.putconn(conn)
+
+        on_hiatus = bool(on_hiatus) 
+
+        return hiatus_num, on_hiatus
+
+
     @discord.ui.button(label='Отпуск', emoji='🙏', style=discord.ButtonStyle.blurple)
     async def hiatus(self, interaction: discord.Interaction, button: discord.ui.Button):
 
@@ -67,7 +97,9 @@ class HiatusButton(View):
             message = self.create_hiatus_response_message(user_id)
 
         except KeyError:
-            self.user_list.update({f"{user_id}":(2, False)})
+            hiatus_num, on_hiatus = await self.initiate_user(interaction)
+
+            self.user_list.update({f"{user_id}":(hiatus_num, on_hiatus)})
 
             message = self.create_hiatus_response_message(user_id)
 
@@ -87,6 +119,20 @@ class HiatusButton(View):
         
 @bot.tree.command(name='hiatus', description='Запустить опрос о пропусках')
 async def hiatus_message(interaction: discord.Interaction):
-    await interaction.response.send_message(view=HiatusButton())
+    await interaction.response.send_message(content="Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск", view=HiatusButton())
+
+#Function for dealing with errors
+async def error_handler(obj, interaction):
+    if isinstance(obj, Exception):
+        await interaction.response.send_message('Не удалось определить пользователя', ephemeral=True, delete_after=10)
+        return 
+    
+def main():
+    global pool 
+    #Initiate a connection pool to a db
+    pool = connect_to_database()
+
+if __name__ == '__main__':
+    main()
 
 bot.run(discord_key)
