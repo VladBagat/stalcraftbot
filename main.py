@@ -30,7 +30,7 @@ class MyBot(commands.Bot):
 if __name__ == "__main__":
     intents = Intents.default()
     intents.message_content = True
-    extens = ['cogs.interactive', 'cogs.scheduled']
+    extens = ['cogs.interactive', 'cogs.scheduled', 'cogs.test']
 
     bot = MyBot(command_prefix='/', intents=intents, extensions=extens)
 
