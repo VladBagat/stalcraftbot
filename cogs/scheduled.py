@@ -14,22 +14,23 @@ class Scheduled(commands.Cog):
         self.check_hiatus.start()
         self.hiatus_view = HiatusButton(bot=self.bot)
                   
-    @tasks.loop(time=time(hour=17, minute=30))
+    @tasks.loop(time=time(hour=18, minute=55))
     async def hiatus_message(self):
-        await self.bot.get_channel(1196881830754930708).send(
+        await self.bot.get_channel(1274462709165068289).send(
             content='Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск', 
-            view=HiatusButton(bot=self.bot))
-    
-    @tasks.loop(time=time(hour=18, minute=10))
+            view=self.hiatus_view)
+
+    @tasks.loop(time=time(hour=19, minute=00))
+    async def update_user(self):
+        print(self.hiatus_view.user_list.values())
+        with self.bot.pool.getconn() as conn:
+            update_hiatus(conn, list(self.hiatus_view.user_list.values()))
+
+    @tasks.loop(time=time(hour=18, minute=00))
     async def check_hiatus(self, interaction: Interaction):
         with self.bot.pool.getconn() as conn:
             results = daily_online_hiatus(conn)
         print(results)
-
-    @tasks.loop(time=time(hour=18, minute=00))
-    async def update_user(self):
-        with self.bot.pool.getconn() as conn:
-            await update_hiatus(conn, list(self.hiatus_view.user_list.values()))
 
     #Function for dealing with errors
     async def error_handler(self, obj, interaction):
@@ -62,6 +63,8 @@ class HiatusButton(View):
             message = f'У вас не осталось пропусков'
             
         self.user_list[f'{user_id}'] = (hiatus_num, on_hiatus, user_nickname)
+
+        print('User list in response message', self.user_list)
         return message
 
     async def initiate_user(self, interaction):
@@ -79,6 +82,8 @@ class HiatusButton(View):
                 hiatus_num, on_hiatus = fetch_hiatus(conn, user_nickname)
         except Exception as e:
             await self.error_handler(e, interaction)
+
+        print('Data in user initialization', hiatus_num, on_hiatus, user_nickname)
         
         return hiatus_num, on_hiatus, user_nickname
 
@@ -93,6 +98,7 @@ class HiatusButton(View):
         except KeyError:
             hiatus_num, on_hiatus, user_nickname = await self.initiate_user(interaction)
             self.user_list.update({f"{user_id}":(hiatus_num, on_hiatus, user_nickname)})
+            print('User list in initiation process', self.user_list)
             message = self.create_hiatus_response_message(user_id)
 
         tasks = []

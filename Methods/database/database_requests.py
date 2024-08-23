@@ -16,6 +16,7 @@ def fetch_hiatus(conn, user_nickname):
     return results
 
 def update_hiatus(conn, user_data_list : list) -> None:
+    print(user_data_list)
     with conn.cursor() as cur:
         update_query = 'UPDATE players SET hiatus_num = %s, is_hiatus = %s WHERE name = %s'
         cur.executemany(update_query, user_data_list)
