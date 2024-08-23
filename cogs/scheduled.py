@@ -14,19 +14,19 @@ class Scheduled(commands.Cog):
         self.check_hiatus.start()
         self.hiatus_view = HiatusButton(bot=self.bot)
                   
-    @tasks.loop(time=time(hour=18, minute=55))
+    @tasks.loop(time=time(hour=17, minute=30))
     async def hiatus_message(self):
         await self.bot.get_channel(1274462709165068289).send(
             content='Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск', 
             view=self.hiatus_view)
 
-    @tasks.loop(time=time(hour=19, minute=00))
+    @tasks.loop(time=time(hour=18, minute=00))
     async def update_user(self):
         print(self.hiatus_view.user_list.values())
         with self.bot.pool.getconn() as conn:
             update_hiatus(conn, list(self.hiatus_view.user_list.values()))
 
-    @tasks.loop(time=time(hour=18, minute=00))
+    @tasks.loop(time=time(hour=18, minute=10))
     async def check_hiatus(self, interaction: Interaction):
         with self.bot.pool.getconn() as conn:
             results = daily_online_hiatus(conn)
