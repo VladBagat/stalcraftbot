@@ -7,17 +7,6 @@ def connect_to_database() -> SimpleConnectionPool:
     return pool
 
 def fetch_hiatus(conn, user_nickname):
-    cur = conn.cursor()
-
-    fetch_query = 'SELECT hiatus_num, is_hiatus FROM players WHERE name = %s'
-
-    cur.execute(fetch_query, (user_nickname,))
-
-    results = cur.fetchone()
-
-    return results
-
-def fetch_hiatus(conn, user_nickname):
     with conn.cursor() as cur:
         fetch_query = 'SELECT hiatus_num, is_hiatus FROM players WHERE name = %s'
         cur.execute(fetch_query, (user_nickname,))
@@ -25,10 +14,11 @@ def fetch_hiatus(conn, user_nickname):
 
     return results
 
-def insert_hiatus(conn, hiatus_num, is_hiatus, user_nickname):
+def update_hiatus(conn, user_data_list : list):
     with conn.cursor() as cur:
-        insert_query = 'INSERT INTO players (hiatus_num, is_hiatus) VALUES (%s, %s) WHERE name = %s'
-        cur.execute(insert_query, (hiatus_num, is_hiatus, user_nickname))
+        update_query = 'UPDATE players SET hiatus_num = %s, is_hiatus = %s WHERE name = %s'
+        print(user_data_list)
+        cur.executemany(update_query, user_data_list)
         conn.commit()
 
     
