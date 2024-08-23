@@ -16,7 +16,7 @@ class Scheduled(commands.Cog):
                   
     @tasks.loop(time=time(hour=17, minute=30))
     async def hiatus_message(self):
-        await self.bot.get_channel(1274462709165068289).send(
+        await self.bot.get_channel(1196881830754930708).send(
             content='Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск', 
             view=HiatusButton(bot=self.bot))
     
