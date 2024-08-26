@@ -1,7 +1,7 @@
 import requests
 from api_key import client_token, user_token
 
-def retrieve_login(user):
+def retrieve_online(user) -> str:
 
     # API endpoint
     url = f'https://eapi.stalcraft.net/EU/character/by-name/{user}/profile'
@@ -21,9 +21,7 @@ def retrieve_login(user):
         return lastLogin
         
     else:
-        error = "Игрок не найден"
-
-        return error
+        raise ValueError('Player not found')
     
 
 def retrieve_clan_members():
