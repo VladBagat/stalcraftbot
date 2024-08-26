@@ -1,11 +1,11 @@
 from discord import Interaction, app_commands, ui, ButtonStyle
 from discord.ui import View
 from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus
-from Methods.API_requests import retrieve_online
+from Methods.API_requests import retrieve_online, retrieve_clan_members
 from Methods.functions import parse_nickname
 from discord.ext import commands, tasks
 from asyncio import gather
-from datetime import time
+from datetime import datetime, timedelta, timezone
 
 class Test(commands.Cog):
     def __init__(self, bot):
@@ -32,6 +32,27 @@ class Test(commands.Cog):
         with self.bot.pool.getconn() as conn:
             results = daily_online_hiatus(conn)
         print(results)
+
+    @app_commands.command(name='test_player_online')
+    @app_commands.default_permissions(administrator=True)
+    async def check_player_online(self, interaction: Interaction):
+        players = retrieve_clan_members()
+
+        names = [player.get('name') for player in players]
+
+        online_times = [retrieve_online(name) for name in names]
+
+        converted_online_times = [datetime.strptime(online_time, r"%Y-%m-%dT%H:%M:%S.%fZ") for online_time in online_times]
+        
+        aware_online_times = [naive.replace(tzinfo=timezone.utc) for naive in converted_online_times]
+
+        end_time = datetime.now(tz=timezone.utc)
+        
+        start_time = end_time - timedelta(minutes=10)    
+    
+        was_on_cw = [end_time >= aware_online_time >= start_time for aware_online_time in aware_online_times]
+
+        print(was_on_cw)
 
     #Function for dealing with errors
     async def error_handler(self, obj, interaction: Interaction) -> None:
