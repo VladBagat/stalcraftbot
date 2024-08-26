@@ -26,7 +26,7 @@ def update_hiatus(conn, user_data_list : list) -> None:
 def daily_online_hiatus(conn):
     #Returns all users with is_hiatus set True and sets is_hiatus to False
     with conn.cursor() as cur:
-        fetch_query = 'SELECT name FROM players WHERE is_hiatus = 1'
+        fetch_query = 'SELECT name, is_hiatus FROM players'
         cur.execute(fetch_query)
         results = cur.fetchall()
         update_query = 'UPDATE players SET is_hiatus = 0'
