@@ -1,17 +1,18 @@
 from discord import Interaction, app_commands, ui, ButtonStyle
 from discord.ui import View
 from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus
+from Methods.API_requests import *
 from Methods.functions import parse_nickname
 from discord.ext import commands, tasks
 from asyncio import gather
-from datetime import time
+from datetime import datetime, timezone, timedelta, time
 
 class Scheduled(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.hiatus_message.start()
-        self.update_user.start()
-        self.check_hiatus.start()
+        self.update_user_hiatus.start()
+        self.check_player_online.start()
         self.hiatus_view = HiatusButton(bot=self.bot)
                   
     @tasks.loop(time=time(hour=9, minute=00))
@@ -21,17 +22,40 @@ class Scheduled(commands.Cog):
             view=self.hiatus_view)
 
     @tasks.loop(time=time(hour=18, minute=00))
-    async def update_user(self):
+    async def update_user_hiatus(self):
         print(self.hiatus_view.user_list.values())
         with self.bot.pool.getconn() as conn:
             update_hiatus(conn, list(self.hiatus_view.user_list.values()))
 
-    @tasks.loop(time=time(hour=18, minute=10))
-    async def check_hiatus(self):
+    @tasks.loop(time=time(hour=22, minute=46))
+    async def check_player_online(self):
         with self.bot.pool.getconn() as conn:
-            results = daily_online_hiatus(conn)
-        print(results)
+            database_responce = daily_online_hiatus(conn)
+        
+        players = []
+        on_hiatus = []
+
+        for user_data in database_responce:
+            players.append(user_data[0])
+            on_hiatus.append(user_data[1])
+
+        online_times = [retrieve_online(name) for name in players]
+
+        converted_online_times = [datetime.strptime(online_time, r"%Y-%m-%dT%H:%M:%S.%fZ") for online_time in online_times]
+        
+        aware_online_times = [naive.replace(tzinfo=timezone.utc) for naive in converted_online_times]
+
+        end_time = datetime.now(tz=timezone.utc)
+        
+        start_time = end_time - timedelta(minutes=10)    
     
+        was_on_cw = [end_time >= aware_online_time >= start_time for aware_online_time in aware_online_times]
+
+        for i in range(0, 30):
+            if not was_on_cw[i] and not on_hiatus[i]:
+                print(f'{players[i]} skipped CW')
+
+
     #Function for dealing with errors
     async def error_handler(self, obj, interaction):
         if isinstance(obj, Exception):
