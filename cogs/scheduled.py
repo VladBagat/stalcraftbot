@@ -31,7 +31,7 @@ class Scheduled(commands.Cog):
         with self.bot.pool.getconn() as conn:
             results = daily_online_hiatus(conn)
         print(results)
-
+    
     #Function for dealing with errors
     async def error_handler(self, obj, interaction):
         if isinstance(obj, Exception):
