@@ -1,6 +1,7 @@
 from discord import Interaction, app_commands, ui, ButtonStyle
 from discord.ui import View
 from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus
+from Methods.API_requests import retrieve_online
 from Methods.functions import parse_nickname
 from discord.ext import commands, tasks
 from asyncio import gather
@@ -10,24 +11,34 @@ class Test(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.hiatus_view = HiatusButton(bot=self.bot)
+        self.whitelisted_channels = [1274462709165068289]
                   
     @app_commands.command(name='test_send_hiatus_message')
+    @app_commands.default_permissions(administrator=True)
     async def hiatus_message(self, interaction: Interaction):
         await self.bot.get_channel(1274462709165068289).send(
             content='Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск', 
             view=self.hiatus_view)
-
-        #Function for dealing with errors
-    async def error_handler(self, obj, interaction):
-        if isinstance(obj, Exception):
-            await interaction.response.send_message('Не удалось определить пользователя', ephemeral=True, delete_after=10)
-            return 
     
     @app_commands.command(name='test_update_database')
-    async def update_user(self, interaction:Interaction):
+    @app_commands.default_permissions(administrator=True)
+    async def update_user(self, interaction: Interaction):
         with self.bot.pool.getconn() as conn:
             update_hiatus(conn, list(self.hiatus_view.user_list.values()))
 
+    @app_commands.command(name='test_check_hiatus')
+    @app_commands.default_permissions(administrator=True)
+    async def check_hiatus(self, interaction: Interaction):
+        with self.bot.pool.getconn() as conn:
+            results = daily_online_hiatus(conn)
+        print(results)
+
+    #Function for dealing with errors
+    async def error_handler(self, obj, interaction: Interaction) -> None:
+        if isinstance(obj, Exception):
+            await interaction.response.send_message('Не удалось определить пользователя', ephemeral=True, delete_after=10)
+            return 
+   
 class HiatusButton(View):
     #Create a questionary about hiatus 
     def __init__(self, bot, *, timeout: int = 1800):
