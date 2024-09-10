@@ -31,3 +31,6 @@ __pycache__/api_key.cpython-312.pyc
 temp.py
 
 test.py
+
+api_key.py
+db_key.py

@@ -1,5 +1,5 @@
 import requests
-from api_key import client_token, user_token
+from keys import keys
 
 def retrieve_online(user) -> str:
 
@@ -9,7 +9,7 @@ def retrieve_online(user) -> str:
     # Set up the headers with the OAuth token
     headers = {
         "Content-Type": "application/json",
-        'Authorization': f'Bearer {client_token}'
+        'Authorization': f'Bearer {keys.client_token}'
     }
 
     response = requests.request("GET", url, headers=headers)
@@ -36,7 +36,7 @@ def retrieve_clan_members():
     # Set up the headers with the OAuth token
     headers = {
         "Content-Type": "application/json",
-        'Authorization': f'Bearer {user_token}'
+        'Authorization': f'Bearer {keys.user_token}'
     }
 
     response = requests.request("GET", url, headers=headers)
