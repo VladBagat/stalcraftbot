@@ -1,6 +1,7 @@
 import psycopg2 as psycopg
-from keys import keys
 from Methods.API_requests import retrieve_clan_members
+from keys import keys
+
 
 #SHOULD BE EXECUTED ONCE
 def create_players_table(conn):
