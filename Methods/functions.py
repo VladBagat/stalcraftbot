@@ -42,7 +42,7 @@ def parse_nickname(user):
         raise ValueError("Invalid nickname format.")
     
     if len(nickname) <= 4:
-        raise ValueError("Invalid input: string is too short or not a string.")
+        raise ValueError("Invalid input: string is too short.")
 
     return nickname
 
