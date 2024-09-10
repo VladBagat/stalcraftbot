@@ -3,7 +3,7 @@ import db_key
 import api_key
 
 
-class keys():
+class Keys():
     def __init__(self) -> None:
         self.client_id = ""
         self.secret = ""
@@ -46,5 +46,17 @@ class keys():
         self.port = db_key.port
         self.password = db_key.password
 
+    def load_keys(self):
+
+        if os.getenv('heroku'):
+            self.load_env_keys()
+            print('Heroku')
+        else:
+            self.load_loc_keys()
+            print('Local')
+    
     def test(self):
-        print(self.client_id)
+        print(self.password)
+
+keys = Keys()
+keys.load_keys()
