@@ -1,9 +1,9 @@
 from psycopg2.pool import SimpleConnectionPool
-from db_key import user, dbname, password, host
+from keys import keys
 from Methods.API_requests import retrieve_clan_members
 
 def connect_to_database() -> SimpleConnectionPool:
-    pool = SimpleConnectionPool(minconn=1, maxconn=10, dbname=dbname, user=user, password=password, host=host)
+    pool = SimpleConnectionPool(minconn=1, maxconn=10, dbname=keys.dbname, user=keys.user, password=keys.password, host=keys.host)
     return pool
 
 #Functions for Scheduled.HiatusButton
@@ -34,3 +34,10 @@ def daily_online_hiatus(conn):
         conn.commit()
 
     return results
+
+def increment_player_penalty(conn, players:list):
+    with conn.cursor() as cur:
+        data = [(100000, player) for player in players]
+        update_penalty_query = "UPDATE players SET penalty = penalty + %s WHERE name = %s AND NOT rank = 'RECRUIT'"
+        cur.executemany(update_penalty_query, data)
+        conn.commit()
