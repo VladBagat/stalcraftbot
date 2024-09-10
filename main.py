@@ -32,6 +32,7 @@ class MyBot(commands.Bot):
 
 
 if __name__ == "__main__":
+    
     intents = Intents.default()
     intents.message_content = True
     extens = ['cogs.interactive', 'cogs.scheduled', 'cogs.test']
@@ -39,11 +40,6 @@ if __name__ == "__main__":
     bot = MyBot(command_prefix='/', intents=intents, extensions=extens)
 
     initiate_database()
-
-    if os.getenv('heroku'):
-        keys.load_env_keys()
-    else:
-        keys.load_loc_keys()
 
     bot.run(keys.discord_key)
 
