@@ -1,6 +1,7 @@
 from psycopg2.pool import SimpleConnectionPool
-from keys import keys
 from Methods.API_requests import retrieve_clan_members
+from keys import keys
+
 
 def connect_to_database() -> SimpleConnectionPool:
     pool = SimpleConnectionPool(minconn=1, maxconn=10, dbname=keys.dbname, user=keys.user, password=keys.password, host=keys.host)
