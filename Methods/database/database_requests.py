@@ -34,3 +34,10 @@ def daily_online_hiatus(conn):
         conn.commit()
 
     return results
+
+def increment_player_penalty(conn, players:list):
+    with conn.cursor() as cur:
+        data = [(100000, player) for player in players]
+        update_penalty_query = "UPDATE players SET penalty = penalty + %s WHERE name = %s AND NOT rank = 'RECRUIT'"
+        cur.executemany(update_penalty_query, data)
+        conn.commit()

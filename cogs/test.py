@@ -1,6 +1,6 @@
 from discord import Interaction, app_commands, ui, ButtonStyle
 from discord.ui import View
-from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus
+from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, increment_player_penalty
 from Methods.API_requests import retrieve_online, retrieve_clan_members
 from Methods.functions import parse_nickname
 from discord.ext import commands, tasks
@@ -34,13 +34,19 @@ class Test(commands.Cog):
         print(results)
 
     @app_commands.command(name='test_player_online')
-    @app_commands.default_permissions(administrator=True)
+    @app_commands.default_permissions()
     async def check_player_online(self, interaction: Interaction):
-        players = retrieve_clan_members()
+        with self.bot.pool.getconn() as conn:
+            database_responce = daily_online_hiatus(conn)
+        
+        players = []
+        on_hiatus = []
 
-        names = [player.get('name') for player in players]
+        for user_data in database_responce:
+            players.append(user_data[0])
+            on_hiatus.append(user_data[1])
 
-        online_times = [retrieve_online(name) for name in names]
+        online_times = [retrieve_online(name) for name in players]
 
         converted_online_times = [datetime.strptime(online_time, r"%Y-%m-%dT%H:%M:%S.%fZ") for online_time in online_times]
         
@@ -52,7 +58,14 @@ class Test(commands.Cog):
     
         was_on_cw = [end_time >= aware_online_time >= start_time for aware_online_time in aware_online_times]
 
-        print(was_on_cw)
+        late_players = []
+
+        for i in range(0, 30):
+            if not was_on_cw[i] and not on_hiatus[i]:
+                late_players.append(players[i])
+
+        with self.bot.pool.getconn() as conn:
+            increment_player_penalty(conn, late_players)
 
     #Function for dealing with errors
     async def error_handler(self, obj, interaction: Interaction) -> None:

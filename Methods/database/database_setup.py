@@ -5,7 +5,16 @@ from Methods.API_requests import retrieve_clan_members
 #SHOULD BE EXECUTED ONCE
 def create_players_table(conn):
     cur = conn.cursor()
-    table_arguments = '(id serial PRIMARY KEY, name text, rank text, brawl_skip integer, tournament_skip integer, hiatus_num integer, is_hiatus integer)'
+    table_arguments = '''(
+        id serial PRIMARY KEY,
+        name text,
+        rank text,
+        brawl_skip integer,
+        tournament_skip integer,
+        hiatus_num integer,
+        is_hiatus integer, 
+        penalty integer
+    )'''
     create_players_table = f"CREATE TABLE IF NOT EXISTS players {table_arguments}"
     cur.execute(create_players_table)
     conn.commit()
@@ -13,7 +22,7 @@ def create_players_table(conn):
 
 def prepare_players_data():
     names, ranks = prepare_players()
-    data = [(name, rank, 0, 0, 2, 0) for name, rank in zip(names, ranks)]
+    data = [(name, rank, 0, 0, 2, 0, 0) for name, rank in zip(names, ranks)]
     return data
 
 def initiate_database():
@@ -44,7 +53,7 @@ def refresh_players():
 
 def insert_players(conn, data):
     cur = conn.cursor()
-    cur.executemany("INSERT INTO players (name, rank, brawl_skip, tournament_skip, hiatus_num, is_hiatus) VALUES (%s, %s, %s, %s, %s, %s)", data)
+    cur.executemany("INSERT INTO players (name, rank, brawl_skip, tournament_skip, hiatus_num, is_hiatus, penalty) VALUES (%s, %s, %s, %s, %s, %s, %s)", data)
     conn.commit()
     cur.close()
 

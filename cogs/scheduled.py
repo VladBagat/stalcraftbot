@@ -51,9 +51,11 @@ class Scheduled(commands.Cog):
     
         was_on_cw = [end_time >= aware_online_time >= start_time for aware_online_time in aware_online_times]
 
+        late_players = []
+
         for i in range(0, 30):
             if not was_on_cw[i] and not on_hiatus[i]:
-                print(f'{players[i]} skipped CW')
+                late_players.append(players[i])
 
 
     #Function for dealing with errors
