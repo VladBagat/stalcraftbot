@@ -1,5 +1,5 @@
 from psycopg2.pool import SimpleConnectionPool
-from Methods.API_requests import retrieve_clan_members
+from Methods.API_requests import parse_clan_members
 from keys import keys
 import os
 
@@ -47,3 +47,44 @@ def increment_player_penalty(conn, players:list):
         update_penalty_query = f"UPDATE {database_name} SET penalty = penalty + %s WHERE name = %s AND NOT rank = 'RECRUIT'"
         cur.executemany(update_penalty_query, data)
         conn.commit()
+
+#WIP WIP WIP WIP
+def update_clan_members(conn):
+    with conn.cursor() as cur:
+        names, ranks = parse_clan_members()
+
+        fetch_members_query = f"SELECT name FROM {database_name}"
+        cur.execute(fetch_members_query)
+        database_members = cur.fetchall()
+
+        left, joined = find_missing_members(names, database_members)
+
+        joined_ranks = [ranks[joined.index(joined_member)] for joined_member in joined]
+        
+        delete_users_query = f"DELETE FROM {database_name} WHERE name = %s"
+        print(left)
+        cur.executemany(delete_users_query, (left,))
+
+        insert_users_qury = f"INSERT INTO {database_name} (name, rank, hiatus_num, is_hiatus, penalty) VALUES (%s, %s, %s, %s, %s)"
+        data = [(name, rank, 2, 0, 0) for name, rank in zip(joined, joined_ranks)]
+        cur.executemany(insert_users_qury, data)
+
+        conn.commit()
+        
+               
+def find_missing_members(new_members, old_members):
+    left_clan_members = []
+    joined_clan_members = []
+
+    old_members = [old_member[0] for old_member in old_members]
+
+    for i in range(len(old_members)):
+        if old_members[i] not in new_members:
+            left_clan_members.append(old_members[i])
+
+    for i in range(len(new_members)):    
+        if new_members[i] not in old_members:
+            joined_clan_members.append(new_members[i])
+
+    return left_clan_members, joined_clan_members
+    
