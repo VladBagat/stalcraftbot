@@ -1,11 +1,11 @@
 import requests
-from Methods.api_key import client_id, secret, client_token
+from keys import keys
 
 def get_token():
     url = "https://exbo.net/oauth/token"
     data = {
-        "client_id": f"{client_id}",  
-        "client_secret": f"{secret}",  
+        "client_id": f"{keys.client_id}",  
+        "client_secret": f"{keys.secret}",  
         "grant_type": "client_credentials",
         "scope": "" 
     }
