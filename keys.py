@@ -23,7 +23,7 @@ class Keys():
         self.secret = os.getenv('secret')
         self.client_token = os.getenv('client_token')
         self.user_token = os.getenv('user_token')
-        self. refresh_token = os.getenv('refresh_token')
+        self.refresh_token = os.getenv('refresh_token')
         self.discord_key = os.getenv('discord_key')
         self.user_code = os.getenv('user_code')
         self.host = os.getenv('host')
@@ -36,7 +36,7 @@ class Keys():
         self.client_id = api_key.client_id
         self.secret = api_key.secret
         self.client_token = api_key.client_token
-        self.user_token = api_key.user_code
+        self.user_token = api_key.user_token
         self.refresh_token = api_key.refresh_token
         self.discord_key = api_key.discord_key_test
         self.user_code = api_key.user_code

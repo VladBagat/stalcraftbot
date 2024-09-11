@@ -1,6 +1,6 @@
 from discord import Interaction, app_commands, ui, ButtonStyle
 from discord.ui import View
-from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, increment_player_penalty
+from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, increment_player_penalty, update_clan_members
 from Methods.API_requests import retrieve_online, retrieve_clan_members
 from Methods.functions import parse_nickname
 from discord.ext import commands, tasks
@@ -12,6 +12,12 @@ class Test(commands.Cog):
         self.bot = bot
         self.hiatus_view = HiatusButton(bot=self.bot)
         self.whitelisted_channels = [1274462709165068289]
+
+    @app_commands.command(name="test_sync_database")
+    @app_commands.default_permissions(administrator=True)
+    async def sync_database(self, interaction: Interaction):
+        with self.bot.pool.getconn() as conn:
+            update_clan_members(conn)
                   
     @app_commands.command(name='test_send_hiatus_message')
     @app_commands.default_permissions(administrator=True)
@@ -60,7 +66,7 @@ class Test(commands.Cog):
 
         late_players = []
 
-        for i in range(0, 30):
+        for i in range(len(players)):
             if not was_on_cw[i] and not on_hiatus[i]:
                 late_players.append(players[i])
 
