@@ -1,6 +1,6 @@
 from discord import Intents
 from discord.ext import commands
-from Methods.database.database_requests import connect_to_database
+from Methods.database.database_requests import connect_to_database, update_clan_members
 from Methods.database.database_setup import initiate_database
 from keys import keys
 import os
@@ -32,7 +32,7 @@ class MyBot(commands.Bot):
 
 
 if __name__ == "__main__":
-    
+
     intents = Intents.default()
     intents.message_content = True
     extens = ['cogs.interactive', 'cogs.scheduled', 'cogs.test']

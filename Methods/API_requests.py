@@ -29,8 +29,6 @@ def retrieve_clan_members():
     #Og Groove Street id
     clan_id = "9d49d17e-8b20-45de-b0d1-6574bcd92a3d"
     
-
-    #API endpoint
     url = f'https://eapi.stalcraft.net/EU/clan/{clan_id}/members'
 
     # Set up the headers with the OAuth token
@@ -48,3 +46,15 @@ def retrieve_clan_members():
     else:
         
         return f"Error: {response.status_code}, {response.text}"
+    
+def parse_clan_members():
+    names = []
+    ranks = []
+
+    players = retrieve_clan_members()
+
+    for i in range(len(players)):
+        names.append(players[i].get("name"))
+        ranks.append(players[i].get("rank"))
+
+    return names, ranks
