@@ -1,6 +1,6 @@
 from discord import Interaction, app_commands, ui, ButtonStyle
 from discord.ui import View
-from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus
+from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, update_clan_members
 from Methods.API_requests import *
 from Methods.functions import parse_nickname
 from discord.ext import commands, tasks
@@ -17,6 +17,8 @@ class Scheduled(commands.Cog):
                   
     @tasks.loop(time=time(hour=9, minute=00))
     async def hiatus_message(self):
+        with self.bot.pool.getconn() as conn:
+            update_clan_members(conn)
         await self.bot.get_channel(1274462709165068289).send(
             content='Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск', 
             view=self.hiatus_view)
