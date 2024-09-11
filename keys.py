@@ -1,6 +1,10 @@
 import os
-import db_key
-import api_key
+
+try:
+    import db_key
+    import api_key
+except:
+    pass
 
 
 class Keys():
