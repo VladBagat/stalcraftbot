@@ -19,7 +19,7 @@ class Scheduled(commands.Cog):
     async def hiatus_message(self):
         with self.bot.pool.getconn() as conn:
             update_clan_members(conn)
-        await self.bot.get_channel(1274462709165068289).send(
+        await self.bot.get_channel(1283514404733714494).send(
             content='Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск', 
             view=self.hiatus_view)
 
