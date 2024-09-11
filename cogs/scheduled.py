@@ -68,7 +68,7 @@ class Scheduled(commands.Cog):
     
 class HiatusButton(View):
     #Create a questionary about hiatus 
-    def __init__(self, bot, *, timeout: int = 1800):
+    def __init__(self, bot, *, timeout: int = 18000):
         super().__init__(timeout=timeout)
         self.user_list = {}
         self.last_message = None
