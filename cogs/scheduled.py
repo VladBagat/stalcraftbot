@@ -29,7 +29,7 @@ class Scheduled(commands.Cog):
         with self.bot.pool.getconn() as conn:
             update_hiatus(conn, list(self.hiatus_view.user_list.values()))
 
-    @tasks.loop(time=time(hour=22, minute=46))
+    @tasks.loop(time=time(hour=18, minute=9))
     async def check_player_online(self):
         with self.bot.pool.getconn() as conn:
             database_responce = daily_online_hiatus(conn)
