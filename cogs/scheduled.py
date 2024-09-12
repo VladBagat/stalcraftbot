@@ -15,7 +15,7 @@ class Scheduled(commands.Cog):
         self.check_player_online.start()
         self.hiatus_view = HiatusButton(bot=self.bot)
                   
-    @tasks.loop(time=time(hour=10, minute=00))
+    @tasks.loop(time=time(hour=11, minute=00))
     async def hiatus_message(self):
         with self.bot.pool.getconn() as conn:
             update_clan_members(conn)
