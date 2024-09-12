@@ -16,7 +16,7 @@ class Scheduled(commands.Cog):
         self.hiatus_view = HiatusButton(bot=self.bot)
                   
     #@tasks.loop(time=time(hour=10, minute=00))
-    @tasks.loop(time=time(hour=17, minute=40))
+    @tasks.loop(time=time(hour=17, minute=43))
     async def hiatus_message(self):
         self.bot.database_request(update_clan_members)
         

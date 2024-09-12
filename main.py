@@ -32,10 +32,10 @@ class MyBot(commands.Bot):
 
     def database_request(self, func, *args, **kwargs):
         try:
-            conn = self.bot.pool.getconn()
+            conn = self.pool.getconn()
             func(conn, *args, **kwargs)
         finally:
-            self.bot.pool.putconn(conn)
+            self.pool.putconn(conn)
 
 
 if __name__ == "__main__":
