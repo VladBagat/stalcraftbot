@@ -17,8 +17,8 @@ class Scheduled(commands.Cog):
                   
     @tasks.loop(time=time(hour=10, minute=00))
     async def hiatus_message(self):
-        with self.bot.pool.getconn() as conn:
-            update_clan_members(conn)
+        self.bot.database_request(update_clan_members)
+        
         await self.bot.get_channel(1283514404733714494).send(
             content='Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск', 
             view=self.hiatus_view)
@@ -26,13 +26,13 @@ class Scheduled(commands.Cog):
     @tasks.loop(time=time(hour=18, minute=00))
     async def update_user_hiatus(self):
         print(self.hiatus_view.user_list.values())
-        with self.bot.pool.getconn() as conn:
-            update_hiatus(conn, list(self.hiatus_view.user_list.values()))
+        
+        self.bot.database_request(update_hiatus(list(self.hiatus_view.user_list.values())))
 
     @tasks.loop(time=time(hour=18, minute=9))
     async def check_player_online(self):
-        with self.bot.pool.getconn() as conn:
-            database_responce = daily_online_hiatus(conn)
+        
+        database_responce = self.bot.database_request(daily_online_hiatus())
         
         players = []
         on_hiatus = []
@@ -106,8 +106,7 @@ class HiatusButton(View):
 
         #Fetch data from DB
         try:
-            with self.bot.pool.getconn() as conn:
-                hiatus_num, on_hiatus = fetch_hiatus(conn, user_nickname)
+            hiatus_num, on_hiatus = self.bot.database_request(fetch_hiatus(user_nickname))
         except Exception as e:
             await self.error_handler(e, interaction)
 
