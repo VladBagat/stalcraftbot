@@ -9,7 +9,7 @@ else:
     database_name = 'players_test'
 
 def connect_to_database() -> SimpleConnectionPool:
-    pool = SimpleConnectionPool(minconn=1, maxconn=10, dbname=keys.dbname, user=keys.user, password=keys.password, host=keys.host)
+    pool = SimpleConnectionPool(minconn=1, maxconn=20, dbname=keys.dbname, user=keys.user, password=keys.password, host=keys.host)
     return pool
 
 #Functions for Scheduled.HiatusButton
