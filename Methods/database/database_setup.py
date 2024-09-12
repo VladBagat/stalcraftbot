@@ -31,13 +31,15 @@ def prepare_players_data():
     return data
 
 def initiate_database():
-    with connect_to_database() as conn:
+    try:
+        conn = connect_to_database() 
         result = create_players_table(conn)
         if not result:
             data = prepare_players_data()
             insert_players(conn, data)
             clone_database(conn)
-    conn.close()
+    finally:
+        conn.close()
 
 #RUNS DYNAMICALLY
 def connect_to_database():
