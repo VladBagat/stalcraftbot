@@ -16,7 +16,7 @@ class Scheduled(commands.Cog):
         self.hiatus_view = HiatusButton(bot=self.bot)
                   
     #@tasks.loop(time=time(hour=10, minute=00))
-    @tasks.loop(time=time(hour=17, minute=43))
+    @tasks.loop(time=time(hour=17, minute=52))
     async def hiatus_message(self):
         self.bot.database_request(update_clan_members)
         
@@ -28,12 +28,12 @@ class Scheduled(commands.Cog):
     async def update_user_hiatus(self):
         print(self.hiatus_view.user_list.values())
         
-        self.bot.database_request(update_hiatus(list(self.hiatus_view.user_list.values())))
+        self.bot.database_request(update_hiatus, list(self.hiatus_view.user_list.values()))
 
     @tasks.loop(time=time(hour=18, minute=9))
     async def check_player_online(self):
         
-        database_responce = self.bot.database_request(daily_online_hiatus())
+        database_responce = self.bot.database_request(daily_online_hiatus)
         
         players = []
         on_hiatus = []
@@ -60,7 +60,7 @@ class Scheduled(commands.Cog):
             if not was_on_cw[i] and not on_hiatus[i]:
                 late_players.append(players[i])
 
-        self.bot.database_request(increment_player_penalty(late_players))
+        self.bot.database_request(increment_player_penalty, late_players)
 
     #Function for dealing with errors
     async def error_handler(self, obj, interaction):
@@ -108,7 +108,7 @@ class HiatusButton(View):
 
         #Fetch data from DB
         try:
-            hiatus_num, on_hiatus = self.bot.database_request(fetch_hiatus(user_nickname))
+            hiatus_num, on_hiatus = self.bot.database_request(fetch_hiatus, user_nickname)
         except Exception as e:
             await self.error_handler(e, interaction)
 
