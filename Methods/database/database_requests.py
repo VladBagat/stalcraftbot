@@ -63,7 +63,7 @@ def update_clan_members(conn):
         
         delete_users_query = f"DELETE FROM {database_name} WHERE name = %s"
         print(left)
-        cur.executemany(delete_users_query, (left,))
+        cur.executemany(delete_users_query, [(item,) for item in left])
 
         insert_users_qury = f"INSERT INTO {database_name} (name, rank, hiatus_num, is_hiatus, penalty) VALUES (%s, %s, %s, %s, %s)"
         data = [(name, rank, 2, 0, 0) for name, rank in zip(joined, joined_ranks)]
