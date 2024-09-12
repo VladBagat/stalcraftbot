@@ -17,7 +17,7 @@ class Test(commands.Cog):
     @app_commands.default_permissions(administrator=True)
     async def sync_database(self, interaction: Interaction):
         
-        self.bot.database_request(update_clan_members())
+        self.bot.database_request(update_clan_members)
                   
     @app_commands.command(name='test_send_hiatus_message')
     @app_commands.default_permissions(administrator=True)
@@ -30,18 +30,18 @@ class Test(commands.Cog):
     @app_commands.default_permissions(administrator=True)
     async def update_user(self, interaction: Interaction):
         
-        self.bot.database_request(update_hiatus(list(self.hiatus_view.user_list.values())))
+        self.bot.database_request(update_hiatus, list(self.hiatus_view.user_list.values()))
 
     @app_commands.command(name='test_check_hiatus')
     @app_commands.default_permissions(administrator=True)
     async def check_hiatus(self, interaction: Interaction):
-        results = self.bot.database_request(daily_online_hiatus())
+        results = self.bot.database_request(daily_online_hiatus)
         print(results)
 
     @app_commands.command(name='test_player_online')
     @app_commands.default_permissions()
     async def check_player_online(self, interaction: Interaction):
-        database_responce = self.bot.database_request(daily_online_hiatus())
+        database_responce = self.bot.database_request(daily_online_hiatus)
         
         players = []
         on_hiatus = []
@@ -68,7 +68,7 @@ class Test(commands.Cog):
             if not was_on_cw[i] and not on_hiatus[i]:
                 late_players.append(players[i])
 
-        self.bot.database_request(increment_player_penalty(late_players))
+        self.bot.database_request(increment_player_penalty, late_players)
 
     #Function for dealing with errors
     async def error_handler(self, obj, interaction: Interaction) -> None:
@@ -114,7 +114,7 @@ class HiatusButton(View):
 
         #Fetch data from DB
         try:
-            hiatus_num, on_hiatus = self.bot.database_request(fetch_hiatus(user_nickname))
+            hiatus_num, on_hiatus = self.bot.database_request(fetch_hiatus, user_nickname)
         except Exception as e:
             await self.error_handler(e, interaction)
         
