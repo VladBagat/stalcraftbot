@@ -15,8 +15,7 @@ class Scheduled(commands.Cog):
         self.check_player_online.start()
         self.hiatus_view = HiatusButton(bot=self.bot)
                   
-    #@tasks.loop(time=time(hour=10, minute=00))
-    @tasks.loop(time=time(hour=19, minute=00))
+    @tasks.loop(time=time(hour=10, minute=00))
     async def hiatus_message(self):
         self.bot.database_request(update_clan_members)
         
@@ -24,15 +23,13 @@ class Scheduled(commands.Cog):
             content='Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск', 
             view=self.hiatus_view)
 
-    #@tasks.loop(time=time(hour=18, minute=00))
-    @tasks.loop(time=time(hour=19, minute=5))
+    @tasks.loop(time=time(hour=18, minute=00))
     async def update_user_hiatus(self):
         print(self.hiatus_view.user_list.values())
         
         self.bot.database_request(update_hiatus, list(self.hiatus_view.user_list.values()))
 
-    #@tasks.loop(time=time(hour=18, minute=9))
-    @tasks.loop(time=time(hour=19, minute=9))
+    @tasks.loop(time=time(hour=18, minute=9))
     async def check_player_online(self):
         
         database_responce = self.bot.database_request(daily_online_hiatus)
