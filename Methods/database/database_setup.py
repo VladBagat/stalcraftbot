@@ -37,6 +37,7 @@ def initiate_database():
             data = prepare_players_data()
             insert_players(conn, data)
             clone_database(conn)
+    conn.close()
 
 #RUNS DYNAMICALLY
 def connect_to_database():

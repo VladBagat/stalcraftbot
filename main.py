@@ -30,6 +30,13 @@ class MyBot(commands.Bot):
     async def on_ready(self):
         print(f'{self.user} has connected to Discord')
 
+    def database_request(self, func, *args, **kwargs):
+        try:
+            conn = self.bot.pool.getconn()
+            func(conn, *args, **kwargs)
+        finally:
+            self.bot.pool.putconn(conn)
+
 
 if __name__ == "__main__":
 
