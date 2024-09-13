@@ -1,6 +1,6 @@
 from discord import Interaction, app_commands, ui, ButtonStyle
 from discord.ui import View
-from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, update_clan_members, increment_player_penalty
+from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, update_clan_members, increment_player_penalty, reset_hiatus_status
 from Methods.API_requests import *
 from Methods.functions import parse_nickname
 from discord.ext import commands, tasks
@@ -14,7 +14,12 @@ class Scheduled(commands.Cog):
         self.update_user_hiatus.start()
         self.check_player_online.start()
         self.hiatus_view = HiatusButton(bot=self.bot)
-                  
+
+    @tasks.loop(time=time(hour=00, minute=00))
+    async def hiatus_message(self):
+        if datetime.today().weekday() ==0:
+            self.bot.database_request(reset_hiatus_status)
+
     @tasks.loop(time=time(hour=10, minute=00))
     async def hiatus_message(self):
         self.bot.database_request(update_clan_members)
