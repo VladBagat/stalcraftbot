@@ -88,3 +88,12 @@ def find_missing_members(new_members, old_members):
 
     return left_clan_members, joined_clan_members
     
+def reset_hiatus_status(conn):
+    hiatus_num = 3
+    penalty = 0 
+
+    reset_hiatus_query = f"UPDATE {database_name} SET hiatus_num = %s, penalty = %s"
+
+    with conn.cursor() as cur:
+        cur.execute(reset_hiatus_query, (hiatus_num, penalty,))
+        conn.commit()
