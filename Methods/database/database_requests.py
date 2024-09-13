@@ -60,7 +60,7 @@ def update_clan_members(conn):
         left, joined = find_missing_members(names, database_members)
 
         joined_ranks = [ranks[joined.index(joined_member)] for joined_member in joined]
-        
+
         delete_users_query = f"DELETE FROM {database_name} WHERE name = %s"
         print(left)
         cur.executemany(delete_users_query, [(item,) for item in left])
@@ -70,8 +70,8 @@ def update_clan_members(conn):
         cur.executemany(insert_users_qury, data)
 
         conn.commit()
-        
-               
+
+
 def find_missing_members(new_members, old_members):
     left_clan_members = []
     joined_clan_members = []
@@ -87,7 +87,7 @@ def find_missing_members(new_members, old_members):
             joined_clan_members.append(new_members[i])
 
     return left_clan_members, joined_clan_members
-    
+
 def reset_hiatus_status(conn):
     hiatus_num = 3
     penalty = 0 

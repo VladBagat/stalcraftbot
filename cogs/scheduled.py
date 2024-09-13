@@ -23,7 +23,7 @@ class Scheduled(commands.Cog):
     @tasks.loop(time=time(hour=10, minute=00))
     async def hiatus_message(self):
         self.bot.database_request(update_clan_members)
-        
+
         await self.bot.get_channel(1283514404733714494).send(
             content='Чтобы отметить пропуск, нажмите на кнопку. Повторное нажатие снимает пропуск', 
             view=self.hiatus_view)
@@ -31,14 +31,14 @@ class Scheduled(commands.Cog):
     @tasks.loop(time=time(hour=18, minute=00))
     async def update_user_hiatus(self):
         print(self.hiatus_view.user_list.values())
-        
+
         self.bot.database_request(update_hiatus, list(self.hiatus_view.user_list.values()))
 
     @tasks.loop(time=time(hour=18, minute=9))
     async def check_player_online(self):
-        
+
         database_responce = self.bot.database_request(daily_online_hiatus)
-        
+
         players = []
         on_hiatus = []
 
@@ -49,13 +49,13 @@ class Scheduled(commands.Cog):
         online_times = [retrieve_online(name) for name in players]
 
         converted_online_times = [datetime.strptime(online_time, r"%Y-%m-%dT%H:%M:%S.%fZ") for online_time in online_times]
-        
+
         aware_online_times = [naive.replace(tzinfo=timezone.utc) for naive in converted_online_times]
 
         end_time = datetime.now(tz=timezone.utc)
-        
+
         start_time = end_time - timedelta(minutes=10)    
-    
+
         was_on_cw = [end_time >= aware_online_time >= start_time for aware_online_time in aware_online_times]
 
         late_players = []
@@ -71,7 +71,7 @@ class Scheduled(commands.Cog):
         if isinstance(obj, Exception):
             await interaction.response.send_message('Не удалось определить пользователя', ephemeral=True, delete_after=10)
             return 
-    
+
 class HiatusButton(View):
     #Create a questionary about hiatus 
     def __init__(self, bot, *, timeout: int = 28800):
@@ -80,11 +80,11 @@ class HiatusButton(View):
         self.last_message = None
         self.last_user = None
         self.bot = bot
-    
+
     def create_hiatus_response_message(self, user_id):
 
         hiatus_num, on_hiatus, user_nickname = self.user_list.get(f'{user_id}')
-        
+
         if not on_hiatus and hiatus_num >= 1:
             on_hiatus = 1
             hiatus_num -= 1
@@ -95,7 +95,7 @@ class HiatusButton(View):
             message = f'Не пропускаю. Осталось пропусков: **{hiatus_num}**'
         else:
             message = f'У вас не осталось пропусков'
-            
+
         self.user_list[f'{user_id}'] = (hiatus_num, on_hiatus, user_nickname)
 
         print('User list in response message', self.user_list)
@@ -117,7 +117,7 @@ class HiatusButton(View):
             await self.error_handler(e, interaction)
 
         print('Data in user initialization', hiatus_num, on_hiatus, user_nickname)
-        
+
         return hiatus_num, on_hiatus, user_nickname
 
     @ui.button(label='Отпуск', emoji='🙏', style=ButtonStyle.blurple)
@@ -137,7 +137,7 @@ class HiatusButton(View):
         tasks = []
 
         tasks.append(interaction.response.send_message(message, ephemeral=True, delete_after=120))
-    
+
         if self.last_message and self.last_user == user_id:
             tasks.append(self.last_message.delete())
         else:
@@ -147,8 +147,6 @@ class HiatusButton(View):
 
         self.last_message = await interaction.original_response()   
         self.last_user = user_id        
-        
+
 async def setup(bot):
     await bot.add_cog(Scheduled(bot))
-
-    
