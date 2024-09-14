@@ -13,10 +13,11 @@ class Scheduled(commands.Cog):
         self.hiatus_message.start()
         self.update_user_hiatus.start()
         self.check_player_online.start()
+        self.reset_hiatus.start()
         self.hiatus_view = HiatusButton(bot=self.bot)
 
     @tasks.loop(time=time(hour=00, minute=00))
-    async def hiatus_message(self):
+    async def reset_hiatus(self):
         if datetime.today().weekday() ==0:
             self.bot.database_request(reset_hiatus_status)
 
