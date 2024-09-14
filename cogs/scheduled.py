@@ -61,7 +61,7 @@ class Scheduled(commands.Cog):
 
         late_players = []
 
-        for i in range(0, 30):
+        for i in range(len(players)):
             if not was_on_cw[i] and not on_hiatus[i]:
                 late_players.append(players[i])
 
