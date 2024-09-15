@@ -27,7 +27,7 @@ def create_players_table(conn):
 def prepare_players_data():
 
     names, ranks = parse_clan_members()
-    data = [(name, rank, 2, 0, 0) for name, rank in zip(names, ranks)]
+    data = [(name, rank, 3, 0, 0) for name, rank in zip(names, ranks)]
     return data
 
 def initiate_database():
