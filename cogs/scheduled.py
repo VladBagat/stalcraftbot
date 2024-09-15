@@ -38,7 +38,7 @@ class Scheduled(commands.Cog):
     @tasks.loop(time=time(hour=18, minute=9))
     async def check_player_online(self):
 
-        database_responce = self.bot.database_request(daily_online_hiatus)
+        database_responce = self.bot.database_request(daily_online_hiatus) or [] #Handles None return
 
         players = []
         on_hiatus = []
@@ -66,6 +66,8 @@ class Scheduled(commands.Cog):
                 late_players.append(players[i])
 
         self.bot.database_request(increment_player_penalty, late_players)
+
+        self.bot.skip = False #Resets skip status for the day
 
     #Function for dealing with errors
     async def error_handler(self, obj, interaction):

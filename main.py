@@ -10,6 +10,7 @@ class MyBot(commands.Bot):
         super().__init__(command_prefix=command_prefix, intents=intents)
         self.extensions_list = extensions
         self.pool = connect_to_database()
+        self.skip = False
 
     async def setup_hook(self):
         # Load the cogs
@@ -31,12 +32,15 @@ class MyBot(commands.Bot):
         print(f'{self.user} has connected to Discord')
 
     def database_request(self, func, *args, **kwargs):
-        try:
-            conn = self.pool.getconn()
-            return func(conn, *args, **kwargs)
-        finally:
-            if conn:
-                self.pool.putconn(conn)
+        if not self.skip:
+            try:
+                conn = self.pool.getconn()
+                return func(conn, *args, **kwargs)
+            finally:
+                if conn:
+                    self.pool.putconn(conn)
+        else:
+            pass
 
 
 if __name__ == "__main__":
