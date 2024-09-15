@@ -41,7 +41,7 @@ class Test(commands.Cog):
     @app_commands.command(name='test_player_online')
     @app_commands.default_permissions()
     async def check_player_online(self, interaction: Interaction):
-        database_responce = self.bot.database_request(daily_online_hiatus)
+        database_responce = self.bot.database_request(daily_online_hiatus) or [] #Handles None return
         
         players = []
         on_hiatus = []
@@ -69,6 +69,8 @@ class Test(commands.Cog):
                 late_players.append(players[i])
 
         self.bot.database_request(increment_player_penalty, late_players)
+
+        self.bot.skip = False #Resets skip status for the day
 
     #Function for dealing with errors
     async def error_handler(self, obj, interaction: Interaction) -> None:

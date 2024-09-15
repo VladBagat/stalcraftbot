@@ -18,7 +18,12 @@ class Interactive(commands.Cog):
             message = 'Игрок не найден'
         
         await interaction.response.send_message(message)
-
+    
+    @app_commands.command(name="skip", description="Пропустить КВ в случае отпуска")
+    @app_commands.default_permissions(administrator=True)
+    async def skip(self, interaction:Interaction):
+        self.bot.skip = True
+        await interaction.response.send_message('КВ пропущено')
 
 async def setup(bot):
     await bot.add_cog(Interactive(bot))
