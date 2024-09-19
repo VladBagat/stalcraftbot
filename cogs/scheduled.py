@@ -21,7 +21,7 @@ class Scheduled(commands.Cog):
         if datetime.today().weekday() ==0:
             self.bot.database_request(reset_hiatus_status)
 
-    @tasks.loop(time=time(hour=10, minute=00))
+    @tasks.loop(time=time(hour=11, minute=00))
     async def hiatus_message(self):
         self.bot.database_request(update_clan_members)
 
