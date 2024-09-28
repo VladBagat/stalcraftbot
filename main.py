@@ -5,6 +5,9 @@ from Methods.database.database_setup import initiate_database
 from keys import keys
 import os
 
+#TODO: Find out why updated members assigned with rank Leader?!
+
+
 class MyBot(commands.Bot):
     def __init__(self, command_prefix, intents, extensions):
         super().__init__(command_prefix=command_prefix, intents=intents)

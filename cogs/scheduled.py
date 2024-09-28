@@ -1,6 +1,6 @@
 from discord import Interaction, app_commands, ui, ButtonStyle
 from discord.ui import View
-from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, update_clan_members, increment_player_penalty, reset_hiatus_status
+from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, update_clan_members, increment_player_penalty, reset_hiatus_status, fetch_players_with_penalty
 from Methods.API_requests import *
 from Methods.functions import parse_nickname
 from discord.ext import commands, tasks
@@ -18,8 +18,26 @@ class Scheduled(commands.Cog):
 
     @tasks.loop(time=time(hour=00, minute=00))
     async def reset_hiatus(self):
-        if datetime.today().weekday() ==0:
+        if datetime.today().weekday() == 0:
             self.bot.database_request(reset_hiatus_status)
+
+            penalty_channel_id = 1289661974862368798
+
+            channel = self.bot.get_channel(penalty_channel_id)
+
+            if channel == None:
+                raise ValueError('Penalty channel not found')
+            
+            result = self.bot.database_request(fetch_players_with_penalty) #[('ArtemNaw', 100000), ...]
+
+            result = [(name[0].replace("'", ''), name[1]) for name in result]
+
+            result = [f'{name[0]} должен {name[1]}\n\n' for name in result]
+
+            final_message = ''.join(result)
+
+            await channel.send(final_message)
+
 
     @tasks.loop(time=time(hour=11, minute=00))
     async def hiatus_message(self):

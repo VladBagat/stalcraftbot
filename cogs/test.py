@@ -1,6 +1,6 @@
 from discord import Interaction, app_commands, ui, ButtonStyle
 from discord.ui import View
-from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, increment_player_penalty, update_clan_members
+from Methods.database.database_requests import fetch_hiatus, update_hiatus, daily_online_hiatus, increment_player_penalty, update_clan_members, reset_hiatus_status, fetch_players_with_penalty
 from Methods.API_requests import retrieve_online, retrieve_clan_members
 from Methods.functions import parse_nickname
 from discord.ext import commands, tasks
@@ -12,6 +12,27 @@ class Test(commands.Cog):
         self.bot = bot
         self.hiatus_view = HiatusButton(bot=self.bot)
         self.whitelisted_channels = [1274462709165068289]
+
+    @app_commands.command(name="test_output_penalty")
+    @app_commands.default_permissions(administrator=True)
+    async def reset_hiatus(self, interaction: Interaction):
+
+        penalty_channel_id = 1289661974862368798
+
+        channel = self.bot.get_channel(penalty_channel_id)
+
+        if channel == None:
+            raise ValueError('Penalty channel not found')
+        
+        result = self.bot.database_request(fetch_players_with_penalty) #[('ArtemNaw', 100000), ...]
+
+        result = [(name[0].replace("'", ''), name[1]) for name in result]
+
+        result = [f'{name[0]} должен {name[1]}\n\n' for name in result]
+
+        final_message = ''.join(result)
+
+        await channel.send(final_message)
 
     @app_commands.command(name="test_sync_database")
     @app_commands.default_permissions(administrator=True)

@@ -41,6 +41,14 @@ def daily_online_hiatus(conn):
 
     return results
 
+def fetch_players_with_penalty(conn):
+    with conn.cursor() as cur:
+        fetch_penalty_query = f"SELECT name, penalty FROM {database_name} WHERE penalty > 0"
+        cur.execute(fetch_penalty_query)
+        result = cur.fetchall()
+
+        return result
+
 def increment_player_penalty(conn, players:list):
     with conn.cursor() as cur:
         data = [(100000, player) for player in players]
