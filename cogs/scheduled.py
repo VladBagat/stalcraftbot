@@ -19,8 +19,6 @@ class Scheduled(commands.Cog):
     @tasks.loop(time=time(hour=00, minute=00))
     async def reset_hiatus(self):
         if datetime.today().weekday() == 0:
-            self.bot.database_request(reset_hiatus_status)
-
             penalty_channel_id = 1289661974862368798
 
             channel = self.bot.get_channel(penalty_channel_id)
@@ -37,6 +35,8 @@ class Scheduled(commands.Cog):
             final_message = ''.join(result)
 
             await channel.send(final_message)
+
+            self.bot.database_request(reset_hiatus_status)
 
 
     @tasks.loop(time=time(hour=11, minute=00))
