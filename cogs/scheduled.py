@@ -87,6 +87,14 @@ class Scheduled(commands.Cog):
 
         self.bot.skip = False #Resets skip status for the day
 
+        penalty_channel_id = 1289661974862368798
+
+        channel = self.bot.get_channel(penalty_channel_id)
+
+        final_message = ''.join(late_players)
+
+        await channel.send(final_message)
+
     #Function for dealing with errors
     async def error_handler(self, obj, interaction):
         if isinstance(obj, Exception):
