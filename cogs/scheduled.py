@@ -91,7 +91,7 @@ class Scheduled(commands.Cog):
 
         channel = self.bot.get_channel(penalty_channel_id)
 
-        final_message = ''.join(late_players)
+        final_message = ' '.join(late_players)
 
         await channel.send(final_message)
 
