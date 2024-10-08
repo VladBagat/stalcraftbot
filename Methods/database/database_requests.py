@@ -66,6 +66,8 @@ def update_clan_members(conn):
         database_members = cur.fetchall()
 
         left, joined = find_missing_members(names, database_members)
+        
+        print('JOINED MEMBERS: ', joined)
 
         joined_ranks = [ranks[joined.index(joined_member)] for joined_member in joined]
 
